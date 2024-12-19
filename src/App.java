@@ -33,12 +33,14 @@ public class App {
         System.out.println("Least Spammy Email: \"" + leastSpammy + "\"");
     }
 
-    // Method for building word frequency maps for each email body
-
     /**
+     * Builds a frequency map of words from the given email body.
+     * The method removes punctuation, converts all words to lowercase,
+     * and counts the occurrences of each word.
      *
-     * @param emailBody
-     * @return
+     * @param emailBody The email body as a string. It should be non-null and can include punctuation or mixed case.
+     * @return A map where the keys are unique words (in lowercase, with punctuation removed),
+     *         and the values are the frequency of each word in the email body.
      */
     public static Map<String, Integer> buildWordFrequencyMap(String emailBody) {
         Map<String, Integer> wordFrequencyMap = new HashMap<>();
@@ -54,10 +56,15 @@ public class App {
     }
 
     /**
-     * Method for calculating the cosine similarity between two word frequency maps
-     * @param emailbody1 email body of the first mail what will be compared
-     * @param emailbody2 email body of the second mail that will be compared
-     * @return
+     * Calculates the cosine similarity between two email bodies based on their word frequency maps.
+     * Cosine similarity measures the similarity between two texts by comparing the frequency
+     * of words in each text, resulting in a value between 0 and 1.
+     *
+     * @param emailbody1 The body of the first email to be compared. It should be a non-null string.
+     * @param emailbody2 The body of the second email to be compared. It should be a non-null string.
+     * @return A double value between 0 and 1 representing the cosine similarity.
+     *         - 1 indicates identical word frequency distributions.
+     *         - 0 indicates no common words or vectors with zero magnitude.
      */
     public static double calculateCosineSimilarity(String emailbody1, String emailbody2) {
         Map<String, Integer> wordFrequencyMap1 = buildWordFrequencyMap(emailbody1);
@@ -88,6 +95,19 @@ public class App {
     }
 
     // Method for creating cosine similarity matrix
+
+    /**
+     * Generates a cosine similarity matrix for a list of email bodies.
+     * The matrix contains pairwise cosine similarity values for the given email bodies,
+     * where each value indicates the similarity between two emails.
+     *
+     * @param emailBodies A list of email body strings to compare. Each string represents the content of an email.
+     *                    The list must not be null, and it can have zero or more email bodies.
+     * @return A 2D array (double[][]) representing the cosine similarity matrix.
+     *         - The matrix is of size n x n, where n is the number of email bodies.
+     *         - Each cell [i][j] contains the cosine similarity between emailBodies.get(i) and emailBodies.get(j).
+     *         - Diagonal elements [i][i] will always be 1.0, as each email is perfectly similar to itself.
+     */
     public static double[][] createCosineSimilarityMatrix(List<String> emailBodies) {
         int n = emailBodies.size();
         double[][] cosineSimilarityMatrix = new double[n][n];
@@ -105,6 +125,19 @@ public class App {
         return cosineSimilarityMatrix;
     }
 
+    /**
+     * Calculates spam probabilities for a list of email bodies based on their cosine similarity.
+     * Each email is assigned a spam probability that reflects its similarity to other emails in the list.
+     * Higher probabilities indicate greater similarity to other emails, suggesting potential spam.
+     *
+     * @param emailBodies A list of email body strings to analyze for spam probability.
+     *                    - If the list is empty, an empty map is returned.
+     *                    - If the list contains a single email, its spam probability is set to 0.0.
+     * @return A map where:
+     *         - Keys are the email body strings.
+     *         - Values are the corresponding spam probabilities (as normalized cosine similarity values).
+     *         - For multiple emails, probabilities are normalized sums of cosine similarities with all other emails.
+     */
     public static Map<String, Double> calculateSpamProbabilities(List<String> emailBodies) {
         Map<String, Double> spamProbMap = new HashMap<>();
         if(emailBodies.isEmpty()) {
